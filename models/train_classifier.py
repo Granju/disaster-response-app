@@ -24,25 +24,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 import re
 import nltk
-nltk.download(['punkt', 'wordnet'])
-nltk.download('averaged_perceptron_tagger')
-
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4'])
 
 class VerbCounter(BaseEstimator, TransformerMixin):
-    """
-    Custom transformer to make a feature of the number of verbs in a message.
-    """
 
     def counting_verbs(self, text):
-        """
-        Counts the number of verbs in a text using pos_tags.
-
-        Input:
-        The text.
-
-        Output:
-        The number of verbs in the text.
-        """
         # tokenize by sentences
         sentence_list = sent_tokenize(text)
 
@@ -70,20 +56,8 @@ class VerbCounter(BaseEstimator, TransformerMixin):
         return pd.DataFrame(X_tagged)
 
 class PronounsCounter(BaseEstimator, TransformerMixin):
-    """
-    Custom transformer to make a feature of the number of pronouns in a message.
-    """
 
     def counting_prons(self, text):
-        """
-        Counts the number of pronouns in a text using pos_tags.
-
-        Input:
-        The text.
-
-        Output:
-        The number of pronouns in the text.
-        """
         # tokenize by sentences
         sentence_list = sent_tokenize(text)
 
@@ -112,7 +86,6 @@ class PronounsCounter(BaseEstimator, TransformerMixin):
             return pd.DataFrame(X_tagged)
 
 
-
 def load_data(database_filepath):
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('messageslabeled', con=engine)
@@ -126,18 +99,8 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    """
-    Create lemmatized tokens from words in a string.
-
-    Input:
-    A string made of oen to several sentences.
-
-    Output:
-    A list of tokenised and lemmatized words.
-    """
 
 
-    # Replacing urls in text with placeholder
     detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
     for url in detected_urls:
         text = text.replace(url,"urlplaceholder")
