@@ -13,6 +13,7 @@ from plotly.graph_objs import Bar
 import joblib
 from sqlalchemy import create_engine
 from sklearn.base import BaseEstimator, TransformerMixin
+import re
 
 
 
@@ -129,7 +130,7 @@ class PronounsCounter(BaseEstimator, TransformerMixin):
 
 
 # load data
-engine = create_engine('sqlite:///../data/DisasterResponse.db')
+engine = create_engine('sqlite:///data/DisasterResponse.db')
 df = pd.read_sql_table('messageslabeled', engine)
 
 # load model
@@ -220,9 +221,9 @@ def go():
     )
 
 
-def main():
-    app.run(host='0.0.0.0', port=3001, debug=True)
+# def main():
+    # app.run(host='0.0.0.0', port=3001, debug=True)
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+    #main()
