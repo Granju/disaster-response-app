@@ -21,6 +21,8 @@ from sklearn.metrics import classification_report,  f1_score, accuracy_score, pr
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from utilities.tokenize import tokenize
+
 
 import re
 import nltk
@@ -97,24 +99,6 @@ def load_data(database_filepath):
 
     return X, y, category_names
 
-
-def tokenize(text):
-
-
-    detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
-    for url in detected_urls:
-        text = text.replace(url,"urlplaceholder")
-
-    tokens = word_tokenize(text)
-
-    lemmatizer = WordNetLemmatizer()
-
-    clean_toks = []
-    for token in tokens:
-        clean_tok = lemmatizer.lemmatize(token).lower().strip()
-        clean_toks.append(clean_tok)
-
-    return clean_toks
 
 
 def build_model():
