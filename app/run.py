@@ -5,7 +5,6 @@ import pandas as pd
 
 from nltk.stem import WordNetLemmatizer
 from nltk import word_tokenize, sent_tokenize, pos_tag
-from nltk.stem import WordNetLemmatizer
 
 from flask import Flask
 from flask import render_template, request, jsonify
