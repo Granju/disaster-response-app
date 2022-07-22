@@ -1,3 +1,7 @@
+import sys
+sys.path.append('..')
+
+from models.train_classifier import tokenize
 
 import json
 import plotly
@@ -14,102 +18,52 @@ from sqlalchemy import create_engine
 from sklearn.base import BaseEstimator, TransformerMixin
 import re
 
-from utilities.tokenize import tokenize
+import nltk
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4',
+              'stopwords'])
+
+def tokenize(text):
+    """
+    Create lemmatized tokens from words in a string and remove stopwords.
+
+    Input:
+    Text as a string.
+
+    Output:
+    A list of tokenised and lemmatized words.
+    """
+    # Replacing urls in text with placeholder
+    from nltk.corpus import stopwords
+
+    detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
+                               '[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
+    for url in detected_urls:
+        text = text.replace(url,"urlplaceholder")
 
 
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+    sw_nltk = stopwords.words('english')
 
+    clean_tokens = []
+    for tok in tokens:
+        if tok not in sw_nltk:
+            clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+            clean_tokens.append(clean_tok)
+
+    return clean_tokens
+    
 app = Flask(__name__)
 
-class VerbCounter(BaseEstimator, TransformerMixin):
-    """
-    Custom transformer to make a feature of the number of verbs in a message.
-    """
 
-    def counting_verbs(self, text):
-        """
-        Counts the number of verbs in a text using pos_tags.
-
-        Input:
-        The text.
-
-        Output:
-        The number of verbs in the text.
-        """
-        # tokenize by sentences
-        sentence_list = sent_tokenize(text)
-
-        verbs_count = 0
-        verb_tags = ['VB', 'VBG', 'VBD', 'VBN', 'VBP', 'VBZ']
-
-        for sentence in sentence_list:
-            # tokenize each sentence into words and tag part of speech
-            pos_tags = pos_tag(word_tokenize(sentence))
-
-            # iterate tags to count verbs
-            for i in range(len(pos_tags)):
-                if pos_tags[i][1] in verb_tags:
-                    verbs_count +=1
-
-        return verbs_count
-
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, X):
-        # apply counting_verb function to all values in X
-        X_tagged = pd.Series(X).apply(self.counting_verbs)
-
-        return pd.DataFrame(X_tagged)
-
-class PronounsCounter(BaseEstimator, TransformerMixin):
-    """
-    Custom transformer to make a feature of the number of pronouns in a message.
-    """
-
-    def counting_prons(self, text):
-        """
-        Counts the number of pronouns in a text using pos_tags.
-
-        Input:
-        The text.
-
-        Output:
-        The number of pronouns in the text.
-        """
-        # tokenize by sentences
-        sentence_list = sent_tokenize(text)
-
-        prons_count = 0
-        pron_tags = ['PRP', 'PRP$']
-
-        for sentence in sentence_list:
-            # tokenize each sentence into words and tag part of speech
-            pos_tags = pos_tag(word_tokenize(sentence))
-
-            # iterate tags to count verbs
-            for i in range(len(pos_tags)):
-                if pos_tags[i][1] in pron_tags:
-                    prons_count +=1
-
-        return prons_count
-
-
-    def fit(self, x, y=None):
-            return self
-
-    def transform(self, X):
-            # apply counting_prons function to all values in X
-            X_tagged = pd.Series(X).apply(self.counting_prons)
-
-            return pd.DataFrame(X_tagged)
 
 
 # load data
-engine = create_engine('sqlite:///data/DisasterResponse.db')
+engine = create_engine('sqlite:///./data/DisasterResponse.db')
 df = pd.read_sql_table('messageslabeled', engine)
 
 # load model
-model = joblib.load("models/classifier.pkl")
+model = joblib.load("./models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model

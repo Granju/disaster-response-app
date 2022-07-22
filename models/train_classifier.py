@@ -13,80 +13,109 @@ from nltk.stem import WordNetLemmatizer
 from gensim.models import Word2Vec
 
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.metrics import classification_report,  f1_score, accuracy_score, precision_score, recall_score
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report,  f1_score
 from sklearn.base import BaseEstimator, TransformerMixin
-
-from utilities.tokenize import tokenize
-
 
 import re
 import nltk
-nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4'])
-
-class VerbCounter(BaseEstimator, TransformerMixin):
-
-    def counting_verbs(self, text):
-        # tokenize by sentences
-        sentence_list = sent_tokenize(text)
-
-        verbs_count = 0
-        verb_tags = ['VB', 'VBG', 'VBD', 'VBN', 'VBP', 'VBZ']
-
-        for sentence in sentence_list:
-            # tokenize each sentence into words and tag part of speech
-            pos_tags = pos_tag(word_tokenize(sentence))
-
-            # iterate tags to count verbs
-            for i in range(len(pos_tags)):
-                if pos_tags[i][1] in verb_tags:
-                    verbs_count +=1
-
-        return verbs_count
-
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, X):
-        # apply counting_verb function to all values in X
-        X_tagged = pd.Series(X).apply(self.counting_verbs)
-
-        return pd.DataFrame(X_tagged)
-
-class PronounsCounter(BaseEstimator, TransformerMixin):
-
-    def counting_prons(self, text):
-        # tokenize by sentences
-        sentence_list = sent_tokenize(text)
-
-        prons_count = 0
-        pron_tags = ['PRP', 'PRP$']
-
-        for sentence in sentence_list:
-            # tokenize each sentence into words and tag part of speech
-            pos_tags = pos_tag(word_tokenize(sentence))
-
-            # iterate tags to count verbs
-            for i in range(len(pos_tags)):
-                if pos_tags[i][1] in pron_tags:
-                    prons_count +=1
-
-        return prons_count
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4',
+               'stopwords'])
 
 
-    def fit(self, x, y=None):
-            return self
+def tokenize(text):
+    """
+    Create lemmatized tokens from words in a string.
 
-    def transform(self, X):
-            # apply counting_prons function to all values in X
-            X_tagged = pd.Series(X).apply(self.counting_prons)
+    Input:
+    A string made of oen to several sentences.
 
-            return pd.DataFrame(X_tagged)
+    Output:
+    A list of tokenised and lemmatized words.
+    """
+    # Replacing urls in text with placeholder
+    from nltk.corpus import stopwords
 
+    detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
+                               '[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
+    for url in detected_urls:
+        text = text.replace(url,"urlplaceholder")
+
+
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+    sw_nltk = stopwords.words('english')
+
+    clean_tokens = []
+    for tok in tokens:
+        if tok not in sw_nltk:
+            clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+            clean_tokens.append(clean_tok)
+
+    return clean_tokens
+
+# class VerbsCounter(BaseEstimator, TransformerMixin):
+#
+#     def counting_verbs(self, text):
+#         # tokenize by sentences
+#         sentence_list = sent_tokenize(text)
+#
+#         verbs_count = 0
+#         verb_tags = ['VB', 'VBG', 'VBD', 'VBN', 'VBP', 'VBZ']
+#
+#         for sentence in sentence_list:
+#             # tokenize each sentence into words and tag part of speech
+#             pos_tags = pos_tag(word_tokenize(sentence))
+#
+#             # iterate tags to count verbs
+#             for i in range(len(pos_tags)):
+#                 if pos_tags[i][1] in verb_tags:
+#                     verbs_count +=1
+#
+#         return verbs_count
+#
+#     def fit(self, x, y=None):
+#         return self
+#
+#     def transform(self, X):
+#         # apply counting_verb function to all values in X
+#         X_tagged = pd.Series(X).apply(self.counting_verbs)
+#
+#         return pd.DataFrame(X_tagged)
+#
+# class PronounsCounter(BaseEstimator, TransformerMixin):
+#
+#     def counting_prons(self, text):
+#         # tokenize by sentences
+#         sentence_list = sent_tokenize(text)
+#
+#         prons_count = 0
+#         pron_tags = ['PRP', 'PRP$']
+#
+#         for sentence in sentence_list:
+#             # tokenize each sentence into words and tag part of speech
+#             pos_tags = pos_tag(word_tokenize(sentence))
+#
+#             # iterate tags to count verbs
+#             for i in range(len(pos_tags)):
+#                 if pos_tags[i][1] in pron_tags:
+#                     prons_count +=1
+#
+#         return prons_count
+#
+#
+#     def fit(self, x, y=None):
+#             return self
+#
+#     def transform(self, X):
+#             # apply counting_prons function to all values in X
+#             X_tagged = pd.Series(X).apply(self.counting_prons)
+#
+#             return pd.DataFrame(X_tagged)
+#
 
 def load_data(database_filepath):
     engine = create_engine('sqlite:///'+database_filepath)
@@ -103,21 +132,12 @@ def load_data(database_filepath):
 
 def build_model():
 
-
-
-
     # Creating pipeline
     pipeline = Pipeline([
-    ('features', FeatureUnion([
 
     ('text_pipeline', Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer(use_idf=True))
-    ])),
-
-    ('verb', VerbCounter()),
-
-    ('pron', PronounsCounter())
     ])),
 
     ('clf', MultiOutputClassifier(AdaBoostClassifier(random_state=42)))
@@ -144,9 +164,11 @@ def evaluate_model(model, X_test, Y_test, category_names):
     for category in category_names:
         print('{} classification report:'.format(category))
         print(classification_report(Y_test[category], Y_pred[category]))
-        f1_scores.append(f1_score(Y_test[category], Y_pred[category], average='micro'))
+        f1_scores.append(f1_score(Y_test[category], Y_pred[category],
+                         average='micro'))
 
-    print('Average of labels micro averaged f1 scores: {}'.format(sum(f1_scores)/len(f1_scores)))
+    print('Average of labels micro averaged' \
+          'f1 scores: {}'.format(sum(f1_scores)/len(f1_scores)))
 
 
 def save_model(model, model_filepath):
