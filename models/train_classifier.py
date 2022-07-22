@@ -1,4 +1,7 @@
 import sys
+sys.path.append('..')
+
+from utilities.utils import tokenize
 
 import numpy as np
 import pandas as pd
@@ -26,96 +29,96 @@ nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4',
                'stopwords'])
 
 
-def tokenize(text):
-    """
-    Create lemmatized tokens from words in a string.
-
-    Input:
-    A string made of oen to several sentences.
-
-    Output:
-    A list of tokenised and lemmatized words.
-    """
-    # Replacing urls in text with placeholder
-    from nltk.corpus import stopwords
-
-    detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
-                               '[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
-    for url in detected_urls:
-        text = text.replace(url,"urlplaceholder")
-
-
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-    sw_nltk = stopwords.words('english')
-
-    clean_tokens = []
-    for tok in tokens:
-        if tok not in sw_nltk:
-            clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-            clean_tokens.append(clean_tok)
-
-    return clean_tokens
-
-# class VerbsCounter(BaseEstimator, TransformerMixin):
+# def tokenize(text):
+#     """
+#     Create lemmatized tokens from words in a string.
 #
-#     def counting_verbs(self, text):
-#         # tokenize by sentences
-#         sentence_list = sent_tokenize(text)
+#     Input:
+#     A string made of oen to several sentences.
 #
-#         verbs_count = 0
-#         verb_tags = ['VB', 'VBG', 'VBD', 'VBN', 'VBP', 'VBZ']
+#     Output:
+#     A list of tokenised and lemmatized words.
+#     """
+#     # Replacing urls in text with placeholder
+#     from nltk.corpus import stopwords
 #
-#         for sentence in sentence_list:
-#             # tokenize each sentence into words and tag part of speech
-#             pos_tags = pos_tag(word_tokenize(sentence))
-#
-#             # iterate tags to count verbs
-#             for i in range(len(pos_tags)):
-#                 if pos_tags[i][1] in verb_tags:
-#                     verbs_count +=1
-#
-#         return verbs_count
-#
-#     def fit(self, x, y=None):
-#         return self
-#
-#     def transform(self, X):
-#         # apply counting_verb function to all values in X
-#         X_tagged = pd.Series(X).apply(self.counting_verbs)
-#
-#         return pd.DataFrame(X_tagged)
-#
-# class PronounsCounter(BaseEstimator, TransformerMixin):
-#
-#     def counting_prons(self, text):
-#         # tokenize by sentences
-#         sentence_list = sent_tokenize(text)
-#
-#         prons_count = 0
-#         pron_tags = ['PRP', 'PRP$']
-#
-#         for sentence in sentence_list:
-#             # tokenize each sentence into words and tag part of speech
-#             pos_tags = pos_tag(word_tokenize(sentence))
-#
-#             # iterate tags to count verbs
-#             for i in range(len(pos_tags)):
-#                 if pos_tags[i][1] in pron_tags:
-#                     prons_count +=1
-#
-#         return prons_count
+#     detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
+#                                '[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
+#     for url in detected_urls:
+#         text = text.replace(url,"urlplaceholder")
 #
 #
-#     def fit(self, x, y=None):
-#             return self
+#     tokens = word_tokenize(text)
+#     lemmatizer = WordNetLemmatizer()
+#     sw_nltk = stopwords.words('english')
 #
-#     def transform(self, X):
-#             # apply counting_prons function to all values in X
-#             X_tagged = pd.Series(X).apply(self.counting_prons)
+#     clean_tokens = []
+#     for tok in tokens:
+#         if tok not in sw_nltk:
+#             clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+#             clean_tokens.append(clean_tok)
 #
-#             return pd.DataFrame(X_tagged)
+#     return clean_tokens
 #
+# # class VerbsCounter(BaseEstimator, TransformerMixin):
+# #
+# #     def counting_verbs(self, text):
+# #         # tokenize by sentences
+# #         sentence_list = sent_tokenize(text)
+# #
+# #         verbs_count = 0
+# #         verb_tags = ['VB', 'VBG', 'VBD', 'VBN', 'VBP', 'VBZ']
+# #
+# #         for sentence in sentence_list:
+# #             # tokenize each sentence into words and tag part of speech
+# #             pos_tags = pos_tag(word_tokenize(sentence))
+# #
+# #             # iterate tags to count verbs
+# #             for i in range(len(pos_tags)):
+# #                 if pos_tags[i][1] in verb_tags:
+# #                     verbs_count +=1
+# #
+# #         return verbs_count
+# #
+# #     def fit(self, x, y=None):
+# #         return self
+# #
+# #     def transform(self, X):
+# #         # apply counting_verb function to all values in X
+# #         X_tagged = pd.Series(X).apply(self.counting_verbs)
+# #
+# #         return pd.DataFrame(X_tagged)
+# #
+# # class PronounsCounter(BaseEstimator, TransformerMixin):
+# #
+# #     def counting_prons(self, text):
+# #         # tokenize by sentences
+# #         sentence_list = sent_tokenize(text)
+# #
+# #         prons_count = 0
+# #         pron_tags = ['PRP', 'PRP$']
+# #
+# #         for sentence in sentence_list:
+# #             # tokenize each sentence into words and tag part of speech
+# #             pos_tags = pos_tag(word_tokenize(sentence))
+# #
+# #             # iterate tags to count verbs
+# #             for i in range(len(pos_tags)):
+# #                 if pos_tags[i][1] in pron_tags:
+# #                     prons_count +=1
+# #
+# #         return prons_count
+# #
+# #
+# #     def fit(self, x, y=None):
+# #             return self
+# #
+# #     def transform(self, X):
+# #             # apply counting_prons function to all values in X
+# #             X_tagged = pd.Series(X).apply(self.counting_prons)
+# #
+# #             return pd.DataFrame(X_tagged)
+# #
 
 def load_data(database_filepath):
     engine = create_engine('sqlite:///'+database_filepath)

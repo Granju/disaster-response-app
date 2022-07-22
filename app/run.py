@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from models.train_classifier import tokenize
+from utilities.utils import tokenize
 
 import json
 import plotly
@@ -22,48 +22,45 @@ import nltk
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4',
               'stopwords'])
 
-def tokenize(text):
-    """
-    Create lemmatized tokens from words in a string and remove stopwords.
+# def tokenize(text):
+#     """
+#     Create lemmatized tokens from words in a string and remove stopwords.
+#
+#     Input:
+#     Text as a string.
+#
+#     Output:
+#     A list of tokenised and lemmatized words.
+#     """
+#     # Replacing urls in text with placeholder
+#     from nltk.corpus import stopwords
+#
+#     detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
+#                                '[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
+#     for url in detected_urls:
+#         text = text.replace(url,"urlplaceholder")
+#
+#
+#     tokens = word_tokenize(text)
+#     lemmatizer = WordNetLemmatizer()
+#     sw_nltk = stopwords.words('english')
+#
+#     clean_tokens = []
+#     for tok in tokens:
+#         if tok not in sw_nltk:
+#             clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+#             clean_tokens.append(clean_tok)
+#
+#     return clean_tokens
 
-    Input:
-    Text as a string.
-
-    Output:
-    A list of tokenised and lemmatized words.
-    """
-    # Replacing urls in text with placeholder
-    from nltk.corpus import stopwords
-
-    detected_urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'\
-                               '[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
-    for url in detected_urls:
-        text = text.replace(url,"urlplaceholder")
-
-
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-    sw_nltk = stopwords.words('english')
-
-    clean_tokens = []
-    for tok in tokens:
-        if tok not in sw_nltk:
-            clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-            clean_tokens.append(clean_tok)
-
-    return clean_tokens
-    
 app = Flask(__name__)
 
-
-
-
 # load data
-engine = create_engine('sqlite:///./data/DisasterResponse.db')
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('messageslabeled', engine)
 
 # load model
-model = joblib.load("./models/classifier.pkl")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
