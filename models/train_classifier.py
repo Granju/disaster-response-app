@@ -1,7 +1,6 @@
 import sys
-sys.path.append('..')
 
-from utilities.utils import tokenize
+from jf_tokenize_package.tokenize import tokenize
 
 import numpy as np
 import pandas as pd
@@ -25,8 +24,9 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 import re
 import nltk
-nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4',
-               'stopwords'])
+
+
+
 
 
 # def tokenize(text):
@@ -59,7 +59,7 @@ nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger','omw-1.4',
 #             clean_tokens.append(clean_tok)
 #
 #     return clean_tokens
-#
+# #
 # # class VerbsCounter(BaseEstimator, TransformerMixin):
 # #
 # #     def counting_verbs(self, text):

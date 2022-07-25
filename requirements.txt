@@ -30,3 +30,5 @@ tqdm==4.64.0
 Werkzeug==2.1.2
 wincertstore==0.2
 zipp==3.8.0
+nltk
+jf_tokenize_package==1.0.3
