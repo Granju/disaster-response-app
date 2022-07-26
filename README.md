@@ -28,22 +28,22 @@ The app is hosted on Heroku and can be accessed [here] (https://jf-disaster-resp
 
 ### Project structure:
 
-  .
-  ├── requirements.txt
-  ├── nltk.txt
-  ├── Procfile
-  ├── README.md
-  ├── app.py
-  ├── data
-  │   ├── DisasterResponse.db
-  │   ├── categories.csv
-  │   ├── messages.csv
-  │   └── process_data.py
-  ├── model
-  │   ├── classifier.pkl
-  │   └── train_classifier.py
-  └── templates
-      ├── go.html
-      └── master.html
+    .
+    ├── requirements.txt
+    ├── nltk.txt
+    ├── Procfile
+    ├── README.md
+    ├── app.py
+    ├── data
+    │   ├── DisasterResponse.db
+    │   ├── categories.csv
+    │   ├── messages.csv
+    │   └── process_data.py
+    ├── model
+    │   ├── classifier.pkl
+    │   └── train_classifier.py
+    └── templates
+        ├── go.html
+        └── master.html
 
 The files categories.csv and messages.csv contain the data provided by Figure Eight with the messages and their labels.
